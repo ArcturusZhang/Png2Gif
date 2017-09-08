@@ -1,0 +1,41 @@
+﻿<Window x:Class="png2gif.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:png2gif"
+        mc:Ignorable="d"
+        Title="MainWindow" Height="353" Width="525" ResizeMode="CanMinimize">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="26"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="26"/>
+        </Grid.RowDefinitions>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" >
+            <Button Margin = "10,2, 5,2" x:Name="choose_Button" Content="选择文件..." RenderTransformOrigin="0.502,0.5" Click="choose_Button_Click" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="clear_Button" Content="清除所有" Click="clear_Button_Click" IsEnabled="False" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="delete_Button" Content="删除项目" Click="delete_Button_Click" IsEnabled="False" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="moveup_Button" Content="上移" IsEnabled="False" Click="moveup_Button_Click" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="movedown_Button" Content="下移" IsEnabled="False" Click="movedown_Button_Click" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="generate_Button" Content="生成GIF" Click="generate_Button_Click" VerticalAlignment="Center"/>
+        </StackPanel>
+        <GroupBox Margin="5,0,5,0" Header="GIF设定" Grid.Row="1">
+            <StackPanel Orientation="Vertical">
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="保存路径" VerticalAlignment="Center"/>
+                    <TextBox x:Name="targetTextBox" TextWrapping="NoWrap" Text="Untitled.gif" Width="375" VerticalContentAlignment="Center" VerticalAlignment="Center"/>
+                    <Button Margin="5,0,5,0" x:Name="browse_Button" Content="浏览" Width="50" Click="Button_Click" VerticalAlignment="Center"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="帧间隔"/>
+                    <TextBox Margin="11,0,0,0" x:Name="frameTextBox" Text="500" VerticalContentAlignment="Center" VerticalAlignment="Center" Width="50" HorizontalContentAlignment="Right"/>
+                    <Label Content="ms"/>
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+        <ListBox Margin = "5,5,5,0" x:Name="fileList" SelectionChanged="fileList_SelectionChanged" Grid.Row="2"/>
+        <ProgressBar x:Name="progressBar" HorizontalAlignment="Left" Height="20" Margin="10,5,10,5" Grid.Row="3" Width="500" VerticalAlignment="Top" Orientation="Horizontal" Minimum="0"/>
+    </Grid>
+</Window>
