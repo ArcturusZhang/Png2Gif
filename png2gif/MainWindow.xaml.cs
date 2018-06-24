@@ -15,6 +15,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Gif.Components;
+using System.ComponentModel;
 
 namespace png2gif
 {
@@ -23,7 +24,7 @@ namespace png2gif
     /// </summary>
     public partial class MainWindow : Window
     {
-        private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
+        //private delegate void UpdateProgressBarDelegate(System.Windows.DependencyProperty dp, Object value);
 
         public MainWindow()
         {
@@ -58,7 +59,7 @@ namespace png2gif
             clear_Button.IsEnabled = false;
         }
 
-        private void fileList_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void FileList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             // 以后可以考虑利用Converter简化这里的逻辑
             if (fileList.SelectedIndex == -1)
@@ -87,7 +88,7 @@ namespace png2gif
             }
         }
 
-        private void delete_Button_Click(object sender, RoutedEventArgs e)
+        private void Delete_Button_Click(object sender, RoutedEventArgs e)
         {
             fileList.Items.Remove(fileList.SelectedItem);
             if (fileList.Items.IsEmpty)
@@ -96,7 +97,7 @@ namespace png2gif
             }
         }
 
-        private void moveup_Button_Click(object sender, RoutedEventArgs e)
+        private void Moveup_Button_Click(object sender, RoutedEventArgs e)
         {
             var selectedIndex = fileList.SelectedIndex;
             var tmp = fileList.Items[selectedIndex];
@@ -106,7 +107,7 @@ namespace png2gif
             fileList.Focus();
         }
 
-        private void movedown_Button_Click(object sender, RoutedEventArgs e)
+        private void Movedown_Button_Click(object sender, RoutedEventArgs e)
         {
             var selectedIndex = fileList.SelectedIndex;
             var tmp = fileList.Items[selectedIndex];
@@ -115,16 +116,17 @@ namespace png2gif
             fileList.SelectedIndex = selectedIndex + 1;
             fileList.Focus();
         }
+        BackgroundWorker worker;
 
-        private void generate_Button_Click(object sender, RoutedEventArgs e)
+        private void Generate_Button_Click(object sender, RoutedEventArgs e)
         {
             if (!targetTextBox.Text.EndsWith(".gif"))
             {
                 targetTextBox.Text += ".gif";
             }
             string outputFilePath = targetTextBox.Text;
-            AnimatedGifEncoder encoder = new AnimatedGifEncoder();
-            encoder.Start(outputFilePath);
+            //AnimatedGifEncoder encoder = new AnimatedGifEncoder();
+            //encoder.Start(outputFilePath);
             // 时间间隔设定
             int frameStepTime;
             if (!int.TryParse(frameTextBox.Text, out frameStepTime))
@@ -132,21 +134,95 @@ namespace png2gif
                 frameStepTime = 500;
             }
             frameTextBox.Text = frameStepTime.ToString();
-            encoder.SetDelay(frameStepTime);
-            // 还需要增加一个是否循环设定
-            encoder.SetRepeat(0); // -1:no repeat,0:always repeat
-            progressBar.Maximum = fileList.Items.Count;
-            UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
-            for (int i = 0, count = fileList.Items.Count; i < count; i++)
+            //encoder.SetDelay(frameStepTime);
+            //// 还需要增加一个是否循环设定
+            //encoder.SetRepeat(0); // -1:no repeat,0:always repeat
+            //progressBar.Maximum = fileList.Items.Count;
+            //UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
+            //for (int i = 0, count = fileList.Items.Count; i < count; i++)
+            //{
+            //    Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background,
+            //        new object[] { ProgressBar.ValueProperty, (double)i });
+            //    encoder.AddFrame(System.Drawing.Image.FromFile((string)fileList.Items[i]));
+            //}
+            //encoder.Finish();
+            //Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background,
+            //        new object[] { ProgressBar.ValueProperty, progressBar.Maximum });
+            //MessageBox.Show("文件已生成为：" + outputFilePath);
+            // new
+            var files = new List<string>();
+            foreach (var item in fileList.Items)
             {
-                Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background,
-                    new object[] { ProgressBar.ValueProperty, (double)i });
-                encoder.AddFrame(System.Drawing.Image.FromFile((string)fileList.Items[i]));
+                files.Add((string)item);
             }
-            encoder.Finish();
-            Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background,
-                    new object[] { ProgressBar.ValueProperty, progressBar.Maximum });
-            MessageBox.Show("文件已生成为：" + outputFilePath);
+            var argument = new GifArgument()
+            {
+                outputFilePath = outputFilePath,
+                frameRate = frameStepTime,
+                fileList = files
+            };
+            worker = new BackgroundWorker()
+            {
+                WorkerReportsProgress = true,
+                WorkerSupportsCancellation = true
+            };
+            worker.DoWork += GenerateGif;
+            worker.RunWorkerCompleted += OnGifCompleted;
+            worker.ProgressChanged += Worker_ProgressChanged;
+            worker.RunWorkerAsync(argument);
+            LockUIElements();
+        }
+
+        private void LockUIElements()
+        {
+            generate_Button.IsEnabled = false;
+            cancel_Button.IsEnabled = true;
+        }
+
+        private void ResumeUIElements()
+        {
+            generate_Button.IsEnabled = true;
+            cancel_Button.IsEnabled = false;
+            progressBar.Value = 0;
+        }
+
+        private void Worker_ProgressChanged(object sender, ProgressChangedEventArgs e)
+        {
+            progressBar.Value = e.ProgressPercentage;
+        }
+
+        private void OnGifCompleted(object sender, RunWorkerCompletedEventArgs e)
+        {
+            ResumeUIElements();
+            if (e.Cancelled)
+            {
+                MessageBox.Show("已取消");
+            } else
+            {
+                MessageBox.Show("文件已生成为：" + e.Result.ToString());
+            }
+        }
+
+        private void GenerateGif(object sender, DoWorkEventArgs e)
+        {
+            GifArgument argument = e.Argument as GifArgument;
+            AnimatedGifEncoder encoder = new AnimatedGifEncoder();
+            encoder.Start(argument.outputFilePath);
+            encoder.SetDelay(argument.frameRate);
+            encoder.SetRepeat(0);
+            // generate gif
+            for (int i = 0; i < argument.fileList.Count; i++)
+            {
+                if (worker.CancellationPending)
+                {
+                    e.Cancel = true;
+                    return;
+                }
+                encoder.AddFrame(System.Drawing.Image.FromFile(argument.fileList[i]));
+                if (i == argument.fileList.Count - 1) worker.ReportProgress(100);
+                else worker.ReportProgress((int)(100.0 * i / argument.fileList.Count));
+            }
+            e.Result = argument.outputFilePath;
         }
 
         private void Button_Click(object sender, RoutedEventArgs e)
@@ -157,6 +233,18 @@ namespace png2gif
             {
                 targetTextBox.Text = saveDialog.FileName;
             }
+        }
+
+        class GifArgument
+        {
+            public string outputFilePath;
+            public int frameRate;
+            public List<string> fileList;
+        }
+
+        private void Cancel_Button_Click(object sender, RoutedEventArgs e)
+        {
+            worker.CancelAsync();
         }
     }
 }

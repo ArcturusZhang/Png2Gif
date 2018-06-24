@@ -16,10 +16,11 @@
         <StackPanel Grid.Row="0" Orientation="Horizontal" >
             <Button Margin = "10,2, 5,2" x:Name="choose_Button" Content="选择文件..." RenderTransformOrigin="0.502,0.5" Click="choose_Button_Click" VerticalAlignment="Center"/>
             <Button Margin = " 5,2, 5,2" x:Name="clear_Button" Content="清除所有" Click="clear_Button_Click" IsEnabled="False" VerticalAlignment="Center"/>
-            <Button Margin = " 5,2, 5,2" x:Name="delete_Button" Content="删除项目" Click="delete_Button_Click" IsEnabled="False" VerticalAlignment="Center"/>
-            <Button Margin = " 5,2, 5,2" x:Name="moveup_Button" Content="上移" IsEnabled="False" Click="moveup_Button_Click" VerticalAlignment="Center"/>
-            <Button Margin = " 5,2, 5,2" x:Name="movedown_Button" Content="下移" IsEnabled="False" Click="movedown_Button_Click" VerticalAlignment="Center"/>
-            <Button Margin = " 5,2, 5,2" x:Name="generate_Button" Content="生成GIF" Click="generate_Button_Click" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="delete_Button" Content="删除项目" Click="Delete_Button_Click" IsEnabled="False" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="moveup_Button" Content="上移" IsEnabled="False" Click="Moveup_Button_Click" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="movedown_Button" Content="下移" IsEnabled="False" Click="Movedown_Button_Click" VerticalAlignment="Center"/>
+            <Button Margin = " 5,2, 5,2" x:Name="generate_Button" Content="生成GIF" Click="Generate_Button_Click" VerticalAlignment="Center"/>
+            <Button Margin="5, 2, 5, 2" x:Name="cancel_Button" Content="取消生成" Click="Cancel_Button_Click" IsEnabled="False" VerticalAlignment="Center"/>
         </StackPanel>
         <GroupBox Margin="5,0,5,0" Header="GIF设定" Grid.Row="1">
             <StackPanel Orientation="Vertical">
@@ -35,7 +36,7 @@
                 </StackPanel>
             </StackPanel>
         </GroupBox>
-        <ListBox Margin = "5,5,5,0" x:Name="fileList" SelectionChanged="fileList_SelectionChanged" Grid.Row="2"/>
+        <ListBox Margin = "5,5,5,0" x:Name="fileList" SelectionChanged="FileList_SelectionChanged" Grid.Row="2"/>
         <ProgressBar x:Name="progressBar" HorizontalAlignment="Left" Height="20" Margin="10,5,10,5" Grid.Row="3" Width="500" VerticalAlignment="Top" Orientation="Horizontal" Minimum="0"/>
     </Grid>
 </Window>
