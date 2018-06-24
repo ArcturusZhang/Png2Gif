@@ -125,8 +125,6 @@ namespace png2gif
                 targetTextBox.Text += ".gif";
             }
             string outputFilePath = targetTextBox.Text;
-            //AnimatedGifEncoder encoder = new AnimatedGifEncoder();
-            //encoder.Start(outputFilePath);
             // 时间间隔设定
             int frameStepTime;
             if (!int.TryParse(frameTextBox.Text, out frameStepTime))
@@ -134,22 +132,6 @@ namespace png2gif
                 frameStepTime = 500;
             }
             frameTextBox.Text = frameStepTime.ToString();
-            //encoder.SetDelay(frameStepTime);
-            //// 还需要增加一个是否循环设定
-            //encoder.SetRepeat(0); // -1:no repeat,0:always repeat
-            //progressBar.Maximum = fileList.Items.Count;
-            //UpdateProgressBarDelegate updatePbDelegate = new UpdateProgressBarDelegate(progressBar.SetValue);
-            //for (int i = 0, count = fileList.Items.Count; i < count; i++)
-            //{
-            //    Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background,
-            //        new object[] { ProgressBar.ValueProperty, (double)i });
-            //    encoder.AddFrame(System.Drawing.Image.FromFile((string)fileList.Items[i]));
-            //}
-            //encoder.Finish();
-            //Dispatcher.Invoke(updatePbDelegate, System.Windows.Threading.DispatcherPriority.Background,
-            //        new object[] { ProgressBar.ValueProperty, progressBar.Maximum });
-            //MessageBox.Show("文件已生成为：" + outputFilePath);
-            // new
             var files = new List<string>();
             foreach (var item in fileList.Items)
             {
